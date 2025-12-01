@@ -206,11 +206,9 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
     
     // Inicializa os listeners para os links originais (Login e Registro)
     // Se o link switchToLogin existir, adiciona o listener
-    document.getElementById('switchToRegister').addEventListener('click', handleFormSwitch);
-    const switchToLoginLink = document.getElementById('switchToLogin');
-    if (switchToLoginLink) {
-        switchToLoginLink.addEventListener('click', handleFormSwitch);
-    }
+    // CÓDIGO NOVO (INICIALIZAÇÃO CORRETA):
+    // Inicializa o listener APENAS para o link que existe no HTML (Registrar)
+    document.getElementById('switchToRegister').addEventListener('click', handleFormSwitch);
 
     // Simulação de login
     // NOVO CÓDIGO (COGNITO - LOGIN E REGISTRO)
