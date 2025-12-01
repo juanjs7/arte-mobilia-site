@@ -167,23 +167,50 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const form = document.getElementById('loginForm');
 
     // Trocar para Registro
-    document.getElementById('switchToRegister').addEventListener('click', function(e) {
-        e.preventDefault();
+    // CÓDIGO NOVO (LÓGICA DE TROCA CORRIGIDA):
+    // Função para mudar para a tela de Registro
+    function switchToRegister() {
         modalTitle.textContent = 'Registre-se';
         nomeField.style.display = 'block';
         submitBtn.textContent = 'Registrar';
         switchText.innerHTML = 'Já tem conta? <a href="#" id="switchToLogin">Faça Login</a>';
         form.reset();
+        
+        // Anexa o listener de volta para Login
+        document.getElementById('switchToLogin').addEventListener('click', handleFormSwitch);
+    }
 
-        document.getElementById('switchToLogin').addEventListener('click', function(e) {
-            e.preventDefault();
-            modalTitle.textContent = 'Login';
-            nomeField.style.display = 'none';
-            submitBtn.textContent = 'Entrar';
-            switchText.innerHTML = 'Não tem conta? <a href="#" id="switchToRegister">Registre-se</a>';
-            form.reset();
-        });
-    });
+    // Função para mudar para a tela de Login
+    function switchToLogin() {
+        modalTitle.textContent = 'Login';
+        nomeField.style.display = 'none';
+        submitBtn.textContent = 'Entrar';
+        switchText.innerHTML = 'Não tem conta? <a href="#" id="switchToRegister">Registre-se</a>';
+        form.reset();
+
+        // Anexa o listener de volta para Registro
+        document.getElementById('switchToRegister').addEventListener('click', handleFormSwitch);
+    }
+    
+    // Função unificada que determina para onde trocar
+    function handleFormSwitch(e) {
+        e.preventDefault();
+        const targetId = e.target.id;
+        
+        if (targetId === 'switchToRegister') {
+            switchToRegister();
+        } else if (targetId === 'switchToLogin') {
+            switchToLogin();
+        }
+    }
+    
+    // Inicializa os listeners para os links originais (Login e Registro)
+    // Se o link switchToLogin existir, adiciona o listener
+    document.getElementById('switchToRegister').addEventListener('click', handleFormSwitch);
+    const switchToLoginLink = document.getElementById('switchToLogin');
+    if (switchToLoginLink) {
+        switchToLoginLink.addEventListener('click', handleFormSwitch);
+    }
 
     // Simulação de login
     // NOVO CÓDIGO (COGNITO - LOGIN E REGISTRO)
