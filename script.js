@@ -2,29 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // -------- ESTADO DO SISTEMA --------
 
 // Tenta carregar o estado de login do localStorage. O padrão é 'false'.
-// ====================================================================
-// CONFIGURAÇÃO AWS (Inserir após document.addEventListener('DOMContentLoaded', function() {)
-// ====================================================================
-
-// 1. CONFIGURAÇÃO AWS GLOBAL (para Identity Pool e DynamoDB)
-AWS.config.region = 'us-east-1'; // REGIÃO DO SEU PROJETO
-
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: 'us-east-1:3fb50d67-9e73-4d78-ac85-0ac84c3b775f', 
-});
-
-// 2. CONFIGURAÇÃO DO COGNITO USER POOL (para Login/Cadastro)
-const poolData = {
-    UserPoolId : 'us-east-1_Td4YZpRje',      
-    ClientId : 'pikc5sit71vv0bv4j7g6oh73b'       
-};
-
-const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider(); // Usado para Registro
-const dynamodb = new AWS.DynamoDB.DocumentClient(); // Usado para Carrinho
-// ====================================================================
-// FIM DA CONFIGURAÇÃO AWS
-// ====================================================================
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
 // Tenta carregar o carrinho do localStorage. O padrão é um array vazio.
@@ -167,146 +144,47 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const form = document.getElementById('loginForm');
 
     // Trocar para Registro
- // NOVO CÓDIGO (DELEGAÇÃO DE EVENTOS PARA TROCA DE FORMULÁRIO)
-
-    // Função para mudar o modal para a tela de REGISTRO
-    function setFormToRegister() {
+    document.getElementById('switchToRegister').addEventListener('click', function(e) {
+        e.preventDefault();
         modalTitle.textContent = 'Registre-se';
         nomeField.style.display = 'block';
         submitBtn.textContent = 'Registrar';
         switchText.innerHTML = 'Já tem conta? <a href="#" id="switchToLogin">Faça Login</a>';
         form.reset();
-    }
 
-    // Função para mudar o modal para a tela de LOGIN
-    function setFormToLogin() {
-        modalTitle.textContent = 'Login';
-        nomeField.style.display = 'none';
-        submitBtn.textContent = 'Entrar';
-        switchText.innerHTML = 'Não tem conta? <a href="#" id="switchToRegister">Registre-se</a>';
-        form.reset();
-    }
-    
-    // INCLUA ISSO (Logo após setFormToLogin):
-
-const formWrapper = document.getElementById('modalLogin');
-
-// Listener de Eventos na Janela do Modal, usando delegação:
-formWrapper.addEventListener('click', function(e) {
-    if (e.target && e.target.id === 'switchToRegister') {
-        e.preventDefault();
-        setFormToRegister();
-    } else if (e.target && e.target.id === 'switchToLogin') {
-        e.preventDefault();
-        setFormToLogin();
-    }
-});
-    // Certifica-se de que, se o botão "Sair" for clicado e o usuário estiver deslogado,
-    // o formulário volte para o estado de LOGIN (caso tenha sido deixado em "Registro")
-    document.getElementById('loginBtn').addEventListener('click', function() {
-        if (!isLoggedIn) {
-            setFormToLogin();
-        }
+        document.getElementById('switchToLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            modalTitle.textContent = 'Login';
+            nomeField.style.display = 'none';
+            submitBtn.textContent = 'Entrar';
+            switchText.innerHTML = 'Não tem conta? <a href="#" id="switchToRegister">Registre-se</a>';
+            form.reset();
+        });
     });
 
-    // Se o modal for fechado por qualquer motivo, garante que volte para Login
-    const modalLoginElement = document.getElementById('modalLogin');
-    if (modalLoginElement) {
-        modalLoginElement.addEventListener('hidden.bs.modal', setFormToLogin);
-    }
-
     // Simulação de login
-    // NOVO CÓDIGO (COGNITO - LOGIN E REGISTRO)
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const senha = document.getElementById('loginSenha').value;
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const senha = document.getElementById('loginSenha').value;
 
-        if (!email || !senha) {
-            alert('Por favor, preencha todos os campos.');
-            return;
-        }
-        
-        // --- LÓGICA DE REGISTRO (SIGN UP) ---
-        if (submitBtn.textContent === 'Registrar') {
-    
-            const attributeList = [
-                new AmazonCognitoIdentity.CognitoUserAttribute({
-                    Name: 'email',
-                    Value: email
-                }),
-            ];
+        if (email && senha) {
+            if (submitBtn.textContent === 'Registrar') {
+                alert('Registro bem-sucedido! Agora faça login.');
+            } else {
+                alert('Login bem-sucedido! Bem-vindo(a)!');
+                isLoggedIn = true;
+                saveState();
+                updateUI();
 
-            userPool.signUp(email, senha, attributeList, null, function(err, result) {
-                form.reset();
-                if (err) {
-                    console.error("Erro no Registro:", err);
-                    alert("Erro no Registro: " + err.message);
-                    return;
-                }
-                
-                // Se o registro for bem-sucedido:
-                alert('Registro bem-sucedido! Verifique seu e-mail para confirmar a conta e faça login.');
-                // Volta para a tela de Login
-                document.getElementById('switchToLogin').click(); 
-            });
-
-        // --- LÓGICA DE LOGIN (SIGN IN) ---
-        } else {
-            const authenticationData = {
-                Username: email,
-                Password: senha,
-            };
-            const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
-
-            const cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-                Username: email,
-                Pool: userPool
-            });
-
-            cognitoUser.authenticateUser(authenticationDetails, {
-                onSuccess: function (result) {
-                    
-                    // 1. OBTEM O TOKEN DE IDENTIDADE
-                    const idToken = result.getIdToken().getJwtToken();
-
-                    // 2. FORNECE O TOKEN AO IDENTITY POOL
-                    AWS.config.credentials.params.Logins = {};
-                    AWS.config.credentials.params.Logins[
-                        'cognito-idp.us-east-1.amazonaws.com/' + userPool.getUserPoolId()
-                    ] = idToken;
-
-                    // 3. ATUALIZA AS CREDENCIAIS AWS (IMPORTANTE para usar DynamoDB)
-                    AWS.config.credentials.get(function(err) {
-                        if (err) {
-                            console.error("Erro ao obter credenciais AWS:", err);
-                            alert("Erro ao obter credenciais AWS. Tente novamente.");
-                            return;
-                        }
-                        
-                        // Login bem-sucedido e credenciais AWS atualizadas!
-                        form.reset();
-                        alert('Login bem-sucedido! Bem-vindo(a)!');
-                        isLoggedIn = true;
-                        saveState();
-                        updateUI();
-                        
-                        const modalLogin = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
-                        if (modalLogin) modalLogin.hide();
-                    });
-                },
-                onFailure: function(err) {
-                    form.reset();
-                    console.error("Erro no Login:", err);
-                    alert("Erro no Login: " + err.message);
-                },
-                newPasswordRequired: function(userAttributes, requiredAttributes) {
-                    form.reset();
-                    alert("Sua senha precisa ser redefinida. Por favor, redefina sua senha.");
-                }
-            });
+                const modalLogin = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
+                if (modalLogin) modalLogin.hide();
+            }
+            form.reset();
+        } else {
+            alert('Por favor, preencha todos os campos.');
         }
-    });
+    });
 
     // Logout
     loginBtn.addEventListener('click', function(e) {
