@@ -167,29 +167,50 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const form = document.getElementById('loginForm');
 
     // Trocar para Registro
-    // CÓDIGO NOVO (LÓGICA DE TROCA CORRIGIDA):
-    // Função para mudar para a tela de Registro
-    function switchToRegister() {
+ // NOVO CÓDIGO (DELEGAÇÃO DE EVENTOS PARA TROCA DE FORMULÁRIO)
+
+    // Função para mudar o modal para a tela de REGISTRO
+    function setFormToRegister() {
         modalTitle.textContent = 'Registre-se';
         nomeField.style.display = 'block';
         submitBtn.textContent = 'Registrar';
         switchText.innerHTML = 'Já tem conta? <a href="#" id="switchToLogin">Faça Login</a>';
         form.reset();
-        
-        // Anexa o listener de volta para Login
-        document.getElementById('switchToLogin').addEventListener('click', handleFormSwitch);
     }
 
-    // Função para mudar para a tela de Login
-    function switchToLogin() {
+    // Função para mudar o modal para a tela de LOGIN
+    function setFormToLogin() {
         modalTitle.textContent = 'Login';
         nomeField.style.display = 'none';
         submitBtn.textContent = 'Entrar';
         switchText.innerHTML = 'Não tem conta? <a href="#" id="switchToRegister">Registre-se</a>';
         form.reset();
+    }
+    
+    // Delegação de Eventos: Captura cliques em qualquer lugar do documento.
+    // Isso garante que o listener funcione mesmo se os links forem recriados.
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'switchToRegister') {
+            e.preventDefault();
+            setFormToRegister();
+        } else if (e.target && e.target.id === 'switchToLogin') {
+            e.preventDefault();
+            setFormToLogin();
+        }
+    });
 
-        // Anexa o listener de volta para Registro
-        document.getElementById('switchToRegister').addEventListener('click', handleFormSwitch);
+    // Certifica-se de que, se o botão "Sair" for clicado e o usuário estiver deslogado,
+    // o formulário volte para o estado de LOGIN (caso tenha sido deixado em "Registro")
+    document.getElementById('loginBtn').addEventListener('click', function() {
+        if (!isLoggedIn) {
+            setFormToLogin();
+        }
+    });
+
+    // Se o modal for fechado por qualquer motivo, garante que volte para Login
+    const modalLoginElement = document.getElementById('modalLogin');
+    if (modalLoginElement) {
+        modalLoginElement.addEventListener('hidden.bs.modal', setFormToLogin);
     }
     
     // Função unificada que determina para onde trocar
