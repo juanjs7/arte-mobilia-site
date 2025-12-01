@@ -186,28 +186,97 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
     });
 
     // Simulação de login
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const senha = document.getElementById('loginSenha').value;
+    // NOVO CÓDIGO (COGNITO - LOGIN E REGISTRO)
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const senha = document.getElementById('loginSenha').value;
 
-        if (email && senha) {
-            if (submitBtn.textContent === 'Registrar') {
-                alert('Registro bem-sucedido! Agora faça login.');
-            } else {
-                alert('Login bem-sucedido! Bem-vindo(a)!');
-                isLoggedIn = true;
-                saveState();
-                updateUI();
+        if (!email || !senha) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+        }
+        
+        // --- LÓGICA DE REGISTRO (SIGN UP) ---
+        if (submitBtn.textContent === 'Registrar') {
+    
+            const attributeList = [
+                new AmazonCognitoIdentity.CognitoUserAttribute({
+                    Name: 'email',
+                    Value: email
+                }),
+            ];
 
-                const modalLogin = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
-                if (modalLogin) modalLogin.hide();
-            }
-            form.reset();
-        } else {
-            alert('Por favor, preencha todos os campos.');
+            userPool.signUp(email, senha, attributeList, null, function(err, result) {
+                form.reset();
+                if (err) {
+                    console.error("Erro no Registro:", err);
+                    alert("Erro no Registro: " + err.message);
+                    return;
+                }
+                
+                // Se o registro for bem-sucedido:
+                alert('Registro bem-sucedido! Verifique seu e-mail para confirmar a conta e faça login.');
+                // Volta para a tela de Login
+                document.getElementById('switchToLogin').click(); 
+            });
+
+        // --- LÓGICA DE LOGIN (SIGN IN) ---
+        } else {
+            const authenticationData = {
+                Username: email,
+                Password: senha,
+            };
+            const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+
+            const cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+                Username: email,
+                Pool: userPool
+            });
+
+            cognitoUser.authenticateUser(authenticationDetails, {
+                onSuccess: function (result) {
+                    
+                    // 1. OBTEM O TOKEN DE IDENTIDADE
+                    const idToken = result.getIdToken().getJwtToken();
+
+                    // 2. FORNECE O TOKEN AO IDENTITY POOL
+                    AWS.config.credentials.params.Logins = {};
+                    AWS.config.credentials.params.Logins[
+                        'cognito-idp.us-east-1.amazonaws.com/' + userPool.getUserPoolId()
+                    ] = idToken;
+
+                    // 3. ATUALIZA AS CREDENCIAIS AWS (IMPORTANTE para usar DynamoDB)
+                    AWS.config.credentials.get(function(err) {
+                        if (err) {
+                            console.error("Erro ao obter credenciais AWS:", err);
+                            alert("Erro ao obter credenciais AWS. Tente novamente.");
+                            return;
+                        }
+                        
+                        // Login bem-sucedido e credenciais AWS atualizadas!
+                        form.reset();
+                        alert('Login bem-sucedido! Bem-vindo(a)!');
+                        isLoggedIn = true;
+                        saveState();
+                        updateUI();
+                        
+                        const modalLogin = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
+                        if (modalLogin) modalLogin.hide();
+                    });
+                },
+                onFailure: function(err) {
+                    form.reset();
+                    console.error("Erro no Login:", err);
+                    alert("Erro no Login: " + err.message);
+                },
+                newPasswordRequired: function(userAttributes, requiredAttributes) {
+                    form.reset();
+                    alert("Sua senha precisa ser redefinida. Por favor, redefina sua senha.");
+                }
+            });
         }
-    });
+    });
 
     // Logout
     loginBtn.addEventListener('click', function(e) {
