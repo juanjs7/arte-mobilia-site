@@ -187,18 +187,20 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
         form.reset();
     }
     
-    // Delegação de Eventos: Captura cliques em qualquer lugar do documento.
-    // Isso garante que o listener funcione mesmo se os links forem recriados.
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.id === 'switchToRegister') {
-            e.preventDefault();
-            setFormToRegister();
-        } else if (e.target && e.target.id === 'switchToLogin') {
-            e.preventDefault();
-            setFormToLogin();
-        }
-    });
+    // INCLUA ISSO (Logo após setFormToLogin):
 
+const formWrapper = document.getElementById('modalLogin');
+
+// Listener de Eventos na Janela do Modal, usando delegação:
+formWrapper.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'switchToRegister') {
+        e.preventDefault();
+        setFormToRegister();
+    } else if (e.target && e.target.id === 'switchToLogin') {
+        e.preventDefault();
+        setFormToLogin();
+    }
+});
     // Certifica-se de que, se o botão "Sair" for clicado e o usuário estiver deslogado,
     // o formulário volte para o estado de LOGIN (caso tenha sido deixado em "Registro")
     document.getElementById('loginBtn').addEventListener('click', function() {
@@ -212,9 +214,6 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
     if (modalLoginElement) {
         modalLoginElement.addEventListener('hidden.bs.modal', setFormToLogin);
     }
-    
-    // Função unificada que determina para onde trocar
-   
 
     // Simulação de login
     // NOVO CÓDIGO (COGNITO - LOGIN E REGISTRO)
