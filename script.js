@@ -2,6 +2,29 @@ document.addEventListener('DOMContentLoaded', function() {
   // -------- ESTADO DO SISTEMA --------
 
 // Tenta carregar o estado de login do localStorage. O padrão é 'false'.
+// ====================================================================
+// CONFIGURAÇÃO AWS (Inserir após document.addEventListener('DOMContentLoaded', function() {)
+// ====================================================================
+
+// 1. CONFIGURAÇÃO AWS GLOBAL (para Identity Pool e DynamoDB)
+AWS.config.region = 'us-east-1'; // REGIÃO DO SEU PROJETO
+
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'us-east-1:3fb50d67-9e73-4d78-ac85-0ac84c3b775f', 
+});
+
+// 2. CONFIGURAÇÃO DO COGNITO USER POOL (para Login/Cadastro)
+const poolData = {
+    UserPoolId : 'us-east-1_Td4YZpRje',      
+    ClientId : 'pikc5sit71vv0bv4j7g6oh73b'       
+};
+
+const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider(); // Usado para Registro
+const dynamodb = new AWS.DynamoDB.DocumentClient(); // Usado para Carrinho
+// ====================================================================
+// FIM DA CONFIGURAÇÃO AWS
+// ====================================================================
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
 // Tenta carregar o carrinho do localStorage. O padrão é um array vazio.
