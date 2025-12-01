@@ -1,0 +1,254 @@
+document.addEventListener('DOMContentLoaded', function() {
+  // -------- ESTADO DO SISTEMA --------
+
+// Tenta carregar o estado de login do localStorage. O padrão é 'false'.
+let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+// Tenta carregar o carrinho do localStorage. O padrão é um array vazio.
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const loginBtn = document.getElementById('loginBtn');
+    const carrinhoBtn = document.getElementById('carrinhoBtn');
+    const addToCartButtons = document.querySelectorAll('.btn-outline-danger');
+
+    // Carrinho lateral
+    const cartSection = document.getElementById("cart");
+    const cartItems = document.getElementById("cart-items");
+    const cartTotal = document.getElementById("cart-total");
+    const checkoutBtn = document.getElementById("checkout");
+
+// Novo: Elemento para o contador de itens (badge)
+    carrinhoBtn.setAttribute('data-count', cart.length);
+    
+    // ---------------------- FUNÇÃO DE SALVAMENTO ----------------------
+    function saveState() {
+        localStorage.setItem('isLoggedIn', isLoggedIn);
+        // Transforma o array 'cart' em string antes de salvar
+        localStorage.setItem('cart', JSON.stringify(cart));
+        carrinhoBtn.setAttribute('data-count', cart.length);
+        
+        // Lógica para reabilitar/desabilitar o botão do carrinho na UI
+        if (cart.length > 0 || isLoggedIn) {
+            carrinhoBtn.classList.remove('disabled');
+        } else {
+            carrinhoBtn.classList.add('disabled');
+        }
+    }
+  // -------- ATUALIZA UI --------
+    function updateUI() {
+        if (isLoggedIn) {
+            loginBtn.textContent = 'Sair';
+            carrinhoBtn.classList.remove('disabled');
+        } else {
+            loginBtn.textContent = 'Login/Cadastro';
+            
+            // O botão do carrinho só é desabilitado se não estiver logado E o carrinho estiver vazio
+            if (cart.length === 0) {
+                 carrinhoBtn.classList.add('disabled');
+            }
+        }
+        // Salva o novo estado de login no localStorage
+        saveState();
+    }
+
+    // ---------- RENDERIZA CARRINHO ----------
+    function renderCart() {
+        cartItems.innerHTML = "";
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            const li = document.createElement("li");
+            li.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+
+            li.innerHTML = `
+                ${item.name} - R$ ${item.price.toFixed(2)}
+                <button class="btn btn-sm btn-danger remove-item" data-index="${index}">X</button>
+            `;
+
+            cartItems.appendChild(li);
+            total += item.price;
+        });
+
+        cartTotal.textContent = total.toFixed(2);
+        // Salva o carrinho no localStorage após a renderização
+        saveState();
+
+        // Remover item
+        document.querySelectorAll(".remove-item").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const index = e.target.dataset.index;
+                cart.splice(index, 1);
+                renderCart();
+            });
+        });
+    }
+
+    // -------- ABRIR/FECHAR CARRINHO --------
+    carrinhoBtn.addEventListener("click", function(e) {
+        if (!isLoggedIn) return;
+        e.preventDefault();
+
+        cartSection.style.right =
+            cartSection.style.right === "0px" ? "-350px" : "0px";
+    });
+
+    // -------- BOTÕES "ADICIONAR AO CARRINHO" --------
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            if (!isLoggedIn) {
+                alert('Por favor, faça login ou registre-se para adicionar itens ao carrinho.');
+                const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+                modalLogin.show();
+                return;
+            }
+
+            // Captura nome e preço dos atributos data-* do botão no HTML
+            const name = this.dataset.name; 
+            const price = parseFloat(this.dataset.price);
+
+            cart.push({ name, price });
+            renderCart();
+
+            cartSection.style.right = "0px"; // abre automaticamente
+        });
+    });
+
+    // -------- FINALIZAR COMPRA --------
+    checkoutBtn.addEventListener("click", () => {
+        if (!isLoggedIn) { // NOVO: Bloqueia se não estiver logado
+             alert('Você precisa estar logado(a) para finalizar a compra.');
+             const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+             modalLogin.show();
+             return;
+        }
+        
+        if (cart.length === 0) {
+            alert("Seu carrinho está vazio!");
+            return;
+        }
+
+        alert("Compra finalizada! O total de R$ " + cartTotal.textContent + " será processado.");
+        cart = [];
+        renderCart();
+        // O updateUI chama o saveState, garantindo que o carrinho vazio seja salvo
+        updateUI(); 
+    });
+
+    // ---------- LOGIN E REGISTRO ----------
+    const modalTitle = document.getElementById('modalLabelLogin');
+    const nomeField = document.getElementById('nomeField');
+    const submitBtn = document.getElementById('submitLoginBtn');
+    const switchText = document.getElementById('switchFormText');
+    const form = document.getElementById('loginForm');
+
+    // Trocar para Registro
+    document.getElementById('switchToRegister').addEventListener('click', function(e) {
+        e.preventDefault();
+        modalTitle.textContent = 'Registre-se';
+        nomeField.style.display = 'block';
+        submitBtn.textContent = 'Registrar';
+        switchText.innerHTML = 'Já tem conta? <a href="#" id="switchToLogin">Faça Login</a>';
+        form.reset();
+
+        document.getElementById('switchToLogin').addEventListener('click', function(e) {
+            e.preventDefault();
+            modalTitle.textContent = 'Login';
+            nomeField.style.display = 'none';
+            submitBtn.textContent = 'Entrar';
+            switchText.innerHTML = 'Não tem conta? <a href="#" id="switchToRegister">Registre-se</a>';
+            form.reset();
+        });
+    });
+
+    // Simulação de login
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const senha = document.getElementById('loginSenha').value;
+
+        if (email && senha) {
+            if (submitBtn.textContent === 'Registrar') {
+                alert('Registro bem-sucedido! Agora faça login.');
+            } else {
+                alert('Login bem-sucedido! Bem-vindo(a)!');
+                isLoggedIn = true;
+                saveState();
+                updateUI();
+
+                const modalLogin = bootstrap.Modal.getInstance(document.getElementById('modalLogin'));
+                if (modalLogin) modalLogin.hide();
+            }
+            form.reset();
+        } else {
+            alert('Por favor, preencha todos os campos.');
+        }
+    });
+
+    // Logout
+    loginBtn.addEventListener('click', function(e) {
+        if (isLoggedIn) {
+         e.preventDefault();
+            isLoggedIn = false;
+            // O carrinho não é mais limpado ao deslogar.
+            updateUI(); // Chama o updateUI que salva o estado
+            
+            // Fecha o carrinho lateral
+            cartSection.style.right = "-350px"; 
+            
+            alert('Você foi desconectado.');
+        }
+    });
+
+    // ------- FORMULÁRIO DE CONTATO -------
+    const contactForm = document.querySelector('#modalContato form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const mensagem = document.getElementById('mensagem').value.trim();
+
+            if (nome && email && mensagem) {
+                alert('Mensagem enviada com sucesso! Obrigado pelo contato.');
+                contactForm.reset();
+                const modalElement = document.getElementById('modalContato');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) modal.hide();
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        });
+    }
+
+    // ------- CAROUSEL HOVER -------
+    const carousel = document.getElementById('carouselPromocoes');
+    if (carousel) {
+        carousel.addEventListener('mouseenter', function() {
+            const bsCarousel = bootstrap.Carousel.getInstance(carousel);
+            if (bsCarousel) bsCarousel.pause();
+        });
+        carousel.addEventListener('mouseleave', function() {
+            const bsCarousel = bootstrap.Carousel.getInstance(carousel);
+            if (bsCarousel) bsCarousel.cycle();
+        });
+    }
+
+    // ------- SMOOTH SCROLL -------
+    const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Inicializa a interface
+    updateUI();
+    renderCart();
+});

@@ -1,0 +1,100 @@
+/* Estilos Gerais */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+.hero {
+    background: linear-gradient(to right, #624f0d, #1c1e64); /* Vermelho para marca */
+    height: 100vh;
+    background-attachment: fixed;
+}
+
+.hero h1 {
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.card {
+    transition: transform 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Responsividade Extra */
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .carousel-caption {
+        background: rgba(0,0,0,0.5);
+    }
+}
+
+/* Carrinho Simulado (estilo para botão) */
+#carrinhoBtn {
+    position: relative;
+}
+
+#carrinhoBtn::after {
+    content: attr(data-count);
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.8em;
+    display: none; /* Esconde se count=0 */
+}
+
+#carrinhoBtn[data-count]:after {
+    display: block;
+}
+/* Centralizar texto no modal de login */
+#modalLogin .modal-body {
+    text-align: center;
+}
+
+#modalLogin .form-label {
+    width: 100%;
+    text-align: center;
+}
+
+#modalLogin .mb-3 {
+    text-align: center;
+}
+/* Centralizar o título do modal de login */
+#modalLogin .modal-header .modal-title {
+    width: 100%; /* Garante que o título ocupe todo o espaço */
+    text-align: center;
+}
+
+/* Centralizar os rótulos e o texto do formulário */
+#modalLogin .modal-body .form-label,
+#modalLogin .modal-body #switchFormText {
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
+/* Centralizar texto no modal de contato */
+#modalContato .modal-body {
+    text-align: center;
+}

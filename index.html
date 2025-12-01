@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArteMobilia</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="style.css">
+</head>
+<body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-heart text-danger"></i> ArteMobilia</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Início</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#catalogo">Catálogo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#institucional">Sobre</a></li>
+                                        <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalLogin" id="loginBtn">Login/Cadastro</a></li>
+                    <li class="nav-item"><a class="nav-link disabled" href="#" id="carrinhoBtn"><i class="fas fa-shopping-cart"></i> Carrinho</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+        <section id="home" class="hero d-flex align-items-center text-center text-white">
+        <div class="container">
+            <h1 class="display-4">Bem-vindo à ArteMobilia</h1>
+            <p class="lead">Sua melhor loja de móveis!</p>
+            <a href="#catalogo" class="btn btn-danger btn-lg">Ver Produtos</a>
+        </div>
+    </section>
+
+        <section id="promocoes" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Promoções Especiais</h2>
+            <div id="carouselPromocoes" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://artemobilia-ecommerce-mkarsy.s3.us-east-1.amazonaws.com/images/sofa.png" class="d-block w-100" alt="Promo 1" width="50" height="700">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Sofá Azul</h5>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://artemobilia-ecommerce-mkarsy.s3.us-east-1.amazonaws.com/images/lustre.png" class="d-block w-100" alt="Promo 2" width="50" height="700">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>Lustre de vidro</h5>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselPromocoes" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselPromocoes" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+        <section id="catalogo" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Nosso Catálogo</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="https://artemobilia-ecommerce-mkarsy.s3.us-east-1.amazonaws.com/images/guardaroupa.png" class="card-img-top" alt="Roupa Infantil" width="300" height="600">
+                    <div class="card-body">
+                        <h5 class="card-title">Guarda-roupa Maximus</h5>
+                        <p class="card-text">Guarda-roupa de madeira</p>
+                        <button class="btn btn-outline-danger add-to-cart"
+        data-name="Roupa Infantil"
+        data-price="499.99">
+    Adicionar ao Carrinho
+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="https://artemobilia-ecommerce-mkarsy.s3.us-east-1.amazonaws.com/images/poltrona.png" class="card-img-top" alt="Roupa Masculina" width="300" height="600">
+                    <div class="card-body">
+                        <h5 class="card-title">Poltrona Viena</h5>
+                        <p class="card-text">Poltrona azul confort.</p>
+                        <button class="btn btn-outline-danger add-to-cart"
+        data-name="Roupa Masculina"
+        data-price="59.99">
+    Adicionar ao Carrinho
+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="https://artemobilia-ecommerce-mkarsy.s3.us-east-1.amazonaws.com/images/mesa.png" class="card-img-top" alt="Presentes" width="300" height="600">
+                    <div class="card-body">
+                        <h5 class="card-title">Kit Mesa e cadeiras aura</h5>
+                        <p class="card-text">Kit Mesa e cadeiras premium</p>
+                        <button class="btn btn-outline-danger add-to-cart"
+        data-name="Roupa Adulto"
+        data-price="79.99">
+    Adicionar ao Carrinho
+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</section>
+
+        <section id="institucional" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Sobre a ArteMobilia</h2>
+            <p class="lead text-center">Uma loja dedicada a entregar a melhor qualidade de móveis para seu ambiente!!!</p>
+        </div>
+    </section>
+
+        <section id="contato" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Entre em Contato</h2>
+            <p class="text-center">Use o formulário para enviar uma mensagem. Reflita o atendimento presencial com confiança online.</p>
+            <button type="button" class="btn btn-danger btn-lg mx-auto d-block" data-bs-toggle="modal" data-bs-target="#modalContato">Abrir Formulário</button>
+        </div>
+    </section>
+    
+        <div class="modal fade" id="modalContato" tabindex="-1" aria-labelledby="modalLabelContato" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabelContato">Contato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensagem" class="form-label">Mensagem</label>
+                            <textarea class="form-control" id="mensagem" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger mx-auto d-block">Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLabelLogin" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabelLogin">Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3" id="nomeField" style="display: none;">
+                            <label for="loginNome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="loginNome">
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="loginEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label for="loginSenha" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="loginSenha">
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100" id="submitLoginBtn">Entrar</button>
+                        <div class="text-center mt-3">
+                            <p id="switchFormText">Não tem conta? <a href="#" id="switchToRegister">Registre-se</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 ArteMobilia. Todos os direitos reservados.</p>
+            <div>
+                <a href="https://www.instagram.com/artemobiliastore?igsh=cGY0aXhzMHNjeHp2" class="text-white me-3" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="script.js"></script>
+
+<!-- Carrinho Lateral -->
+<aside id="cart" class="cart-section bg-light p-3 border" style="position: fixed; top: 70px; right: -350px; width: 300px; height: 100%; transition: 0.3s; overflow-y: auto; z-index: 9999;">
+    <h4>Carrinho</h4>
+    <ul id="cart-items" class="list-group mb-3"></ul>
+    <p><strong>Total: R$ <span id="cart-total">0.00</span></strong></p>
+    <button class="btn btn-danger w-100" id="checkout">Finalizar Compra</button>
+</aside>
+
+</body>
+</html>
